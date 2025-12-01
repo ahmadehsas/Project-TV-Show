@@ -15,9 +15,26 @@ function makePageForEpisodes(episodeList) {
   // loop over all episodes
   // currently it just logs each episode to the console so we can inspect the data
   episodeList.forEach((episode) => {
-    console.log(episode); 
+    
+    // creates a <div> element that will hold One episode information
+    const card = document.createElement("div");
+
+    // add a CSS class to the card so we can style it later.
+    card.className = "episode-card";
+
+    // Format the episode code like 'S02E07'
+    const episodeCode = `S${episode.season.toString().padStart(2, "0")}E${episode.number.toString().padStart(2, "0")}`;
+
+    // Fill the card with episode information
+    card.innerHTML = `<h3>${episode.name} - ${episodeCode}</h3>
+    <img src="${episode.image.medium}" alt="${episode.name}">
+    <div class="summary"> ${episode.summary}</div>
+    <a href = "${episode.url}" target="_blank">view on TvMaze</a>`;
+
+    // add card to the root element.
+    rootElem.appendChild(card);
   })
-   
+ 
 }
 
 window.onload = setup;
