@@ -1,3 +1,37 @@
-#root {
-  color: red;
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background: #f7f7f7;
 }
+
+#root {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.episode-card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.episode-card img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.summary {
+  margin: 10px 0;
+  font-size: 0.9rem;
+}
+
+.attribution {
+  grid-column: 1 / -1; 
+  text-align: center;
+  margin-top: 30px;
+  font-size: 0.9rem;
+}
+

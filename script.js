@@ -15,7 +15,7 @@ function makePageForEpisodes(episodeList) {
   // loop over all episodes
   // currently it just logs each episode to the console so we can inspect the data
   episodeList.forEach((episode) => {
-    
+
     // creates a <div> element that will hold One episode information
     const card = document.createElement("div");
 
@@ -34,6 +34,12 @@ function makePageForEpisodes(episodeList) {
     // add card to the root element.
     rootElem.appendChild(card);
   })
+  //  Add attribution AFTER the loop
+  const attribution = document.createElement("p");
+  attribution.innerHTML = `Data originally from <a href="https://www.tvmaze.com/" target="_blank">TVMaze.com</a>`;
+  attribution.className = "attribution";
+
+  rootElem.appendChild(attribution);
  
 }
 
