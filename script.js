@@ -1,4 +1,9 @@
 //You can edit ALL of the code here
+
+// create global state.
+let allEpisodes = [];
+
+
 function setup() {
   const allEpisodes = getAllEpisodes();
   makePageForEpisodes(allEpisodes);
