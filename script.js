@@ -1,7 +1,4 @@
 //You can edit ALL of the code here
-let mySearchString = "";
-let episodeCount = 0;
-
 function setup() {
   const allEpisodes = getAllEpisodes();
   makePageForEpisodes(allEpisodes);
@@ -33,25 +30,13 @@ function setup() {
 
     // Update the search counter
     const searchCounter = document.querySelector("#searchString");
-    searchCounter.innerText = `Displaying ${matchCount}/${allEpisodes.length} episodes`;
+    if (searchString === "") {
+      searchCounter.innerText = "";
+    } else {
+      searchCounter.innerText = `Displaying ${matchCount}/${allEpisodes.length} episodes`;
+    }
+    matchCount = 0;
   });
-  /*
-  mySearchString = "";
-  episodeCount = 0;
-
-  document
-    .querySelector("#searchBox")
-    .addEventListener("input", function (event) {
-      searchForEpisode(allEpisodes, event);
-    });*/
-  /**
-   * we need to add an event listener to our input area.
-   * for each keystroke we add the value to our string
-   * we also pass this string to the filter function
-   * we update our count of matching episodes
-   * we display the count of matching episodes
-   * pass the count value to the span element to display.
-   */
 }
 
 function makePageForEpisodes(episodeList) {
@@ -94,53 +79,10 @@ function makePageForEpisodes(episodeList) {
   });
   //  Add attribution AFTER the loop
   const attribution = document.createElement("p");
-  attribution.innerHTML = `Data originally from <a href="https://www.tvmaze.com/" target="_blank">TVMaze.com</a>`;
+  attribution.innerHTML = `Data originally from <a href="https://www.tvmaze.com/" target="_blank">TVMaze.com</a><span><a href="#" id="top">Back to Top<a><span/>`;
   attribution.className = "attribution";
 
   rootElem.appendChild(attribution);
-}
-
-function searchForEpisode(allEpisodes, event) {
-  /**
-   * When a user types a search term into the search box:
-      1. Only episodes whose summary **OR** name contains the search term should be displayed
-        - take the search term entered by user
-        - look through summary and name for match
-          - if match add episode to new list of episodes
-          - if no match do nothing
-      2. The search should be case-**in**sensitive
-        - use regex to make the search term case insensitive
-      3. The display should update **immediately** after each keystroke changes the input
-        - return value after each keystroke
-        - search for match after each keystroke
-      4. Display how many episodes match the current search
-        - count the number of matching episodes and display the total
-      5. If the search box is cleared, **all** episodes should be shown
-        - if search box is clear then display all episodes
-  */
-  /*
-  function matchEpisode(episode) {
-    if (
-      episode.name.toLowerCase().includes(mySearchString) ||
-      episode.summary.toLowerCase().includes(mySearchString)
-    ) {
-      return true;
-    }
-
-    return false;
-  }
-  let matchingEpisodes = [];
-  mySearchString = event.target.value.toLowerCase();
-
-  matchingEpisodes = allEpisodes.filter(matchEpisode);
-  episodeCount = matchingEpisodes.length;
-
-  if (episodeCount > 0) {
-    const matchingEpisodeCount = document.querySelector("#searchString");
-    matchingEpisodeCount.innerText = `Displaying ${episodeCount}/${allEpisodes.length} episodes`;
-  }
-  episodeCount = 0;
-  matchingEpisodes = [];*/
 }
 
 window.onload = setup;
