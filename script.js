@@ -4,47 +4,71 @@
 let allEpisodes = [];
 
 
-function setup() {
-  const allEpisodes = getAllEpisodes();
-  makePageForEpisodes(allEpisodes);
+// Update the setup function to use fetch with async/wait
 
-  const episodeSearch = document.querySelector("#searchBox");
-  episodeSearch.addEventListener("input", (e) => {
-    let searchString = e.target.value.toLowerCase();
-    let episodes = document.querySelectorAll(".episode-card");
-    let matchCount = 0;
+async function setup() {
+  const rootElem = document.getElementById("root");
+  rootElem.innerHTML = "<p>Loading episodes…</p>";
 
-    episodes.forEach((episode) => {
-      let episodeName = (
-        episode.querySelector("h3")?.textContent || ""
-      ).toLowerCase();
-      let episodeSummary = (
-        episode.querySelector(".summary")?.textContent || ""
-      ).toLowerCase();
+  try {
+    const response = await fetch("https://api.tvmaze.com/shows/82/episodes");
+    console.log("Response status:", response.status, response.statusText);
 
-      if (
-        episodeName.includes(searchString) ||
-        episodeSummary.includes(searchString)
-      ) {
-        episode.style.display = "block";
-        matchCount++;
-      } else {
-        episode.style.display = "none";
-      }
+    if (!response.ok) {
+      throw new Error("Failed to load episodes");
+    }
+
+    const responseText = await response.text();
+    console.log("Raw response:", responseText);
+
+    allEpisodes = JSON.parse(responseText); // Parse JSON manually for debugging
+    console.log("Episodes:", allEpisodes);
+
+    makePageForEpisodes(allEpisodes);
+
+    // Activate search ONLY after UI exists
+    setupSearch();
+
+  } catch (error) {
+    console.error("Error:", error);
+    rootElem.innerHTML =
+      "<p>Sorry, something went wrong loading the episodes.</p>";
+  }
+}
+
+function setupSearch() {
+  const searchBox = document.getElementById("searchBox");
+  const searchString = document.getElementById("searchString");
+
+  console.log("Search box:", searchBox);
+  console.log("Search string:", searchString);
+
+  if (!searchBox || !searchString) {
+    console.error("Search box or search string element is missing.");
+    return;
+    console.log(setupSearch);
+  }
+
+  searchBox.addEventListener("input", (event) => {
+    console.log("Search input:", event.target.value); // Debugging log
+    const query = event.target.value.toLowerCase();
+    const filteredEpisodes = allEpisodes.filter((episode) => {
+      const nameMatch = episode.name.toLowerCase().includes(query);
+      const summaryMatch = episode.summary.toLowerCase().includes(query);
+      return nameMatch || summaryMatch;
     });
 
-    // Update the search counter
-    const searchCounter = document.querySelector("#searchString");
-    if (searchString === "") {
-      searchCounter.innerText = "";
-    } else {
-      searchCounter.innerText = `Displaying ${matchCount}/${allEpisodes.length} episodes`;
-    }
-    matchCount = 0;
+    console.log("Filtered episodes:", filteredEpisodes); // Debugging log
+    searchString.textContent = `Displaying ${filteredEpisodes.length}/${allEpisodes.length} episodes`;
+    makePageForEpisodes(filteredEpisodes);
   });
 }
 
+
+window.onload = setup;
+
 function makePageForEpisodes(episodeList) {
+  console.log("Rendering episodes:", episodeList);
   // Get the root container
   // select the < dive id = "root"> in HTML
   const rootElem = document.getElementById("root");
@@ -90,4 +114,4 @@ function makePageForEpisodes(episodeList) {
   rootElem.appendChild(attribution);
 }
 
-window.onload = setup;
+
