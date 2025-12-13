@@ -1,51 +1,90 @@
 //You can edit ALL of the code here
-function setup() {
-  const allEpisodes = getAllEpisodes();
-  makePageForEpisodes(allEpisodes);
 
-  const episodeSearch = document.querySelector("#searchBox");
-  episodeSearch.addEventListener("input", (e) => {
-    let searchString = e.target.value.toLowerCase();
-    let episodes = document.querySelectorAll(".episode-card");
-    let matchCount = 0;
+// create global state.
+let allEpisodes = [];
 
-    episodes.forEach((episode) => {
-      let episodeName = (
-        episode.querySelector("h3")?.textContent || ""
-      ).toLowerCase();
-      let episodeSummary = (
-        episode.querySelector(".summary")?.textContent || ""
-      ).toLowerCase();
 
-      if (
-        episodeName.includes(searchString) ||
-        episodeSummary.includes(searchString)
-      ) {
-        episode.style.display = "block";
-        matchCount++;
-      } else {
-        episode.style.display = "none";
-      }
-    });
+// Update the setup function to use fetch with async/wait
 
-    // Update the search counter
-    const searchCounter = document.querySelector("#searchString");
-    if (searchString === "") {
-      searchCounter.innerText = "";
-    } else {
-      searchCounter.innerText = `Displaying ${matchCount}/${allEpisodes.length} episodes`;
+async function setup() {
+  const rootElem = document.getElementById("root");
+  rootElem.innerHTML = "<p>Loading episodes…</p>";
+
+  try {
+    const response = await fetch("https://api.tvmaze.com/shows/82/episodes");
+    console.log("Response status:", response.status, response.statusText);
+
+    if (!response.ok) {
+      throw new Error("Failed to load episodes");
     }
-    matchCount = 0;
-  });
 
-  selectList(allEpisodes);
+    const responseText = await response.text();
+    console.log("Raw response:", responseText);
 
-  const selectElement = document.querySelector("#dropDownList");
+    allEpisodes = JSON.parse(responseText); // Parse JSON manually for debugging
+    console.log("Episodes:", allEpisodes);
 
-  selectElement.addEventListener("change", selectEpisode);
+    makePageForEpisodes(allEpisodes);
+
+    // Activate search ONLY after UI exists
+    setupSearch();
+
+  } catch (error) {
+    console.error("Error:", error);
+    rootElem.innerHTML =
+      "<p>Sorry, something went wrong loading the episodes.</p>";
+  }
 }
 
+function setupSearch() {
+  const searchBox = document.getElementById("searchBox");
+  const searchString = document.getElementById("searchString");
+
+  console.log("Search box:", searchBox);
+  console.log("Search string:", searchString);
+
+  if (!searchBox || !searchString) {
+    console.error("Search box or search string element is missing.");
+    return;
+    console.log(setupSearch);
+  }
+
+  searchBox.addEventListener("input", (event) => {
+  const query = event.target.value.toLowerCase();
+  let count = 0;
+
+  const episodes = document.querySelectorAll(".episode-card");
+
+  episodes.forEach((episode) => {
+    const title = episode.querySelector("h3")?.textContent.toLowerCase() || "";
+    const summary =
+      episode.querySelector(".summary")?.textContent.toLowerCase() || "";
+
+    if (title.includes(query) || summary.includes(query)) {
+      episode.style.display = "block";
+      count++;
+    } else {
+      episode.style.display = "none";
+    }
+  });
+
+  searchString.textContent = `Displaying ${count}/${allEpisodes.length} episodes`;
+});
+
+
+  if (!document.querySelector("#dropDownList")) {
+  selectList(allEpisodes);
+}
+
+const selectElement = document.querySelector("#dropDownList");
+selectElement.addEventListener("change", selectEpisode);
+}
+
+
+window.onload = setup;
+
 function makePageForEpisodes(episodeList) {
+  console.log("Rendering episodes:", episodeList);
   // Get the root container
   // select the < dive id = "root"> in HTML
   const rootElem = document.getElementById("root");
@@ -91,7 +130,6 @@ function makePageForEpisodes(episodeList) {
   rootElem.appendChild(attribution);
 }
 
-window.onload = setup;
 
 function selectList(episodeArray) {
   // we start by creating the select element to attach the options to.
@@ -152,3 +190,4 @@ function rearrangeName(episode) {
   let nameArray = episode.split("-");
   return `${nameArray[1]} - ${nameArray[0]}`;
 }
+
