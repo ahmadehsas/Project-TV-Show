@@ -62,6 +62,12 @@ function setupSearch() {
     searchString.textContent = `Displaying ${filteredEpisodes.length}/${allEpisodes.length} episodes`;
     makePageForEpisodes(filteredEpisodes);
   });
+
+  selectList(allEpisodes);
+
+  const selectElement = document.querySelector("#dropDownList");
+
+  selectElement.addEventListener("change", selectEpisode);
 }
 
 
@@ -114,4 +120,68 @@ function makePageForEpisodes(episodeList) {
   rootElem.appendChild(attribution);
 }
 
+<<<<<<< HEAD
 
+=======
+window.onload = setup;
+
+function selectList(episodeArray) {
+  // we start by creating the select element to attach the options to.
+  //    we use a for each loop to create the options abd attach them to the select element
+  const displayArea = document.querySelector("#search");
+
+  const selectLabel = document.createElement("label");
+  selectLabel.setAttribute("for", "dropDownList");
+  selectLabel.innerText = "Select episode: ";
+
+  const selectBox = document.createElement("select");
+  selectBox.setAttribute("name", "episode-list");
+  selectBox.setAttribute("id", "dropDownList");
+
+  const defaultOption = document.createElement("option");
+  defaultOption.setAttribute("value", "Choose an episode");
+  defaultOption.innerText = "--Choose an episode--";
+
+  selectLabel.appendChild(selectBox);
+
+  selectBox.appendChild(defaultOption);
+
+  displayArea.append(selectLabel);
+
+  episodeArray.forEach((episode) => {
+    let episodeName = `S${episode.season
+      .toString()
+      .padStart(2, "0")}E${episode.number.toString().padStart(2, "0")} - ${
+      episode.name
+    }`;
+
+    let episodeOption = document.createElement("option");
+    episodeOption.setAttribute("value", episodeName);
+    episodeOption.innerHTML = episodeName;
+
+    selectBox.appendChild(episodeOption);
+  });
+}
+
+function selectEpisode(event) {
+  let selectedEpisode = event.target.value.toLowerCase();
+  let episodes = document.querySelectorAll(".episode-card");
+  episodes.forEach((episode) => {
+    let episodeName = (
+      episode.querySelector("h3")?.textContent || ""
+    ).toLowerCase();
+    if (rearrangeName(episodeName).includes(selectedEpisode)) {
+      episode.style.display = "block";
+    } else if (selectedEpisode === "choose an episode") {
+      episode.style.display = "block";
+    } else {
+      episode.style.display = "none";
+    }
+  });
+}
+
+function rearrangeName(episode) {
+  let nameArray = episode.split("-");
+  return `${nameArray[1]} - ${nameArray[0]}`;
+}
+>>>>>>> main
