@@ -50,24 +50,34 @@ function setupSearch() {
   }
 
   searchBox.addEventListener("input", (event) => {
-    console.log("Search input:", event.target.value); // Debugging log
-    const query = event.target.value.toLowerCase();
-    const filteredEpisodes = allEpisodes.filter((episode) => {
-      const nameMatch = episode.name.toLowerCase().includes(query);
-      const summaryMatch = episode.summary.toLowerCase().includes(query);
-      return nameMatch || summaryMatch;
-    });
+  const query = event.target.value.toLowerCase();
+  let count = 0;
 
-    console.log("Filtered episodes:", filteredEpisodes); // Debugging log
-    searchString.textContent = `Displaying ${filteredEpisodes.length}/${allEpisodes.length} episodes`;
-    makePageForEpisodes(filteredEpisodes);
+  const episodes = document.querySelectorAll(".episode-card");
+
+  episodes.forEach((episode) => {
+    const title = episode.querySelector("h3")?.textContent.toLowerCase() || "";
+    const summary =
+      episode.querySelector(".summary")?.textContent.toLowerCase() || "";
+
+    if (title.includes(query) || summary.includes(query)) {
+      episode.style.display = "block";
+      count++;
+    } else {
+      episode.style.display = "none";
+    }
   });
 
+  searchString.textContent = `Displaying ${count}/${allEpisodes.length} episodes`;
+});
+
+
+  if (!document.querySelector("#dropDownList")) {
   selectList(allEpisodes);
+}
 
-  const selectElement = document.querySelector("#dropDownList");
-
-  selectElement.addEventListener("change", selectEpisode);
+const selectElement = document.querySelector("#dropDownList");
+selectElement.addEventListener("change", selectEpisode);
 }
 
 
@@ -120,10 +130,6 @@ function makePageForEpisodes(episodeList) {
   rootElem.appendChild(attribution);
 }
 
-<<<<<<< HEAD
-
-=======
-window.onload = setup;
 
 function selectList(episodeArray) {
   // we start by creating the select element to attach the options to.
@@ -184,4 +190,4 @@ function rearrangeName(episode) {
   let nameArray = episode.split("-");
   return `${nameArray[1]} - ${nameArray[0]}`;
 }
->>>>>>> main
+
