@@ -10,6 +10,35 @@ body {
   gap: 10px;
 }
 
+#loading {
+  padding: 1rem;
+  background: #eef;
+  color: #004;
+  border-radius: 4px;
+  margin: 1rem 0;
+}
+
+.hidden {
+  display: none;
+}
+
+#error {
+  padding: 1rem;
+  background-color: #fee;
+  color: #900;
+  border: 1px solid #f99;
+  border-radius: 4px;
+  margin: 1rem 0;
+}
+
+#showDropDownList {
+  margin-bottom: 10px;
+  padding: 5px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
 #search {
   grid-column: 1 / -1;
   margin-bottom: 20px;
