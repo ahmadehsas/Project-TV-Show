@@ -113,12 +113,36 @@ function renderShows(shows) {
     `;
 
     card.addEventListener("click", () => {
-      console.log("Show clicked:", show.id);
-    });
+  loadEpisodesForShow(show.id);
+});
 
     showsView.appendChild(card);
   });
 }
+
+// create load episodes function
+
+async function loadEpisodesForShow(showId) {
+  try {
+    showLoading("Loading episodes...");
+
+    const episodes = await fetchEpisodes(showId);
+    currentEpisodes = episodes;
+
+    document.getElementById("shows-view").classList.add("hidden");
+    document.getElementById("episodes-view").classList.remove("hidden");
+
+    makePageForEpisodes(episodes);
+    selectList();
+    setupSearch();
+  } catch (error) {
+    showError("Could not load episodes. Please try again.");
+    console.error(error);
+  } finally {
+    hideLoading();
+  }
+}
+
 
 
 // Update the setup function to use fetch with async/wait
@@ -199,15 +223,13 @@ window.onload = setup;
 function makePageForEpisodes(episodeList) {
   // Get the root container
   // select the < dive id = "root"> in HTML
-  const rootElem = document.getElementById("root");
+  const rootElem = document.getElementById("episodes-view");
+
   rootElem.innerHTML = "";
 
   // clear any text or previous content inside the root.
   //createShowSelect();
 
-  loadShows();
-
-  selectShow();
 
   const search = document.createElement("div");
   search.setAttribute("id", "search");
