@@ -70,8 +70,10 @@ function hideError() {
 }
 
 function resetSearchInput() {
-  document.getElementById("searchBox").value = "";
+  const input = document.getElementById("searchBox");
+  if (input) input.value = "";
 }
+
 
 async function fetchEpisodes(showId) {
   if (episodesCache[showId]) {
@@ -158,8 +160,16 @@ async function setup() {
 
   bodyElem.append(loadingDiv, errorDiv);
 
-  await loadShows(); // ONLY load shows on start
+  const shows = sortShowsAlphabetically(await fetchShows());
+
+  createShowSelect();          // adds the show select dropdown
+  populateShowsList(shows);    // fills it with show options
+  selectShow();                // adds event listener to dropdown
+
+  await loadShows();           // display all shows as cards initially
 }
+
+
 
 
 // async function setup() {
@@ -342,52 +352,48 @@ function rearrangeName(episode) {
 
 function createShowSelect() {
   const rootElem = document.querySelector("#root");
-  //rootElem.innerHTML = "";
-  const search = document.createElement("div");
-  search.setAttribute("id", "show-search");
 
-  rootElem.appendChild(search);
+  const showSearch = document.createElement("div");
+  showSearch.id = "show-search";
 
-  const displayArea = document.querySelector("#search");
-
-  const showSelectLabel = document.createElement("label");
-  showSelectLabel.setAttribute("for", "showDropDownList");
-  showSelectLabel.innerText = "Select Show: ";
+  const label = document.createElement("label");
+  label.setAttribute("for", "showDropDownList");
+  label.innerText = "Select Show: ";
 
   const selectBox = document.createElement("select");
-  selectBox.setAttribute("name", "show-list");
-  selectBox.setAttribute("id", "showDropDownList");
+  selectBox.id = "showDropDownList";
+  selectBox.name = "show-list";
 
   const defaultOption = document.createElement("option");
-  defaultOption.setAttribute("value", "");
-  defaultOption.innerText = "--All Shows--";
-
-  showSelectLabel.appendChild(selectBox);
+  defaultOption.value = "";
+  defaultOption.textContent = "--All Shows--";
 
   selectBox.appendChild(defaultOption);
-
-  search.appendChild(showSelectLabel);
+  label.appendChild(selectBox);
+  showSearch.appendChild(label);
+  rootElem.prepend(showSearch);
 }
+
 
 function populateShowsList(shows) {
 // Disabled for Level 500
 
-  // const selectBox = document.querySelector("#showDropDownList");
-  // if (!selectBox) {
-  //   console.error("#showDropDownList not found");
-  //   return;
-  // }
+  const selectBox = document.querySelector("#showDropDownList");
+  if (!selectBox) {
+    console.error("#showDropDownList not found");
+    return;
+  }
 
-  // // Clear existing options and add default
-  // selectBox.innerHTML = '<option value="">--All Shows--</option>';
+  // Clear existing options and add default
+  selectBox.innerHTML = '<option value="">--All Shows--</option>';
 
-  // shows.forEach((show) => {
-  //   let episodeOption = document.createElement("option");
-  //   episodeOption.setAttribute("value", show.id);
-  //   episodeOption.textContent = show.name;
+  shows.forEach((show) => {
+    let episodeOption = document.createElement("option");
+    episodeOption.setAttribute("value", show.id);
+    episodeOption.textContent = show.name;
 
-  //   selectBox.appendChild(episodeOption);
-  // });
+    selectBox.appendChild(episodeOption);
+  });
 }
 
 function selectShow() {
@@ -395,7 +401,6 @@ function selectShow() {
     .getElementById("showDropDownList")
     .addEventListener("change", async (e) => {
       const showId = e.target.value;
-
       if (!showId) return;
 
       try {
@@ -403,6 +408,9 @@ function selectShow() {
 
         const episodes = await fetchEpisodes(showId);
         currentEpisodes = episodes;
+
+        document.getElementById("shows-view").classList.add("hidden");
+        document.getElementById("episodes-view").classList.remove("hidden");
 
         makePageForEpisodes(episodes);
         selectList();
@@ -416,6 +424,7 @@ function selectShow() {
       }
     });
 }
+
 /**
  * 1. Add a `select` element to your page so the user can choose a show.
     * add another select element    
