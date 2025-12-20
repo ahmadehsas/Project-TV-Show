@@ -36,7 +36,8 @@ async function loadShows() {
     const shows = await fetchShows();
     const sortedShows = sortShowsAlphabetically(shows);
 
-    populateShowsList(sortedShows);
+    renderShows(sortedShows);
+
   } catch (error) {
     showError("Could not load shows. Please refresh the page.");
     console.error(error);
@@ -90,6 +91,35 @@ async function fetchEpisodes(showId) {
 
   return episodes;
 }
+
+// create render function 
+
+function renderShows(shows) {
+  const showsView = document.getElementById("shows-view");
+  showsView.innerHTML = "";
+
+  shows.forEach((show) => {
+    const card = document.createElement("div");
+    card.className = "show-card";
+
+    card.innerHTML = `
+      <h2>${show.name}</h2>
+      <img src="${show.image?.medium || ""}" alt="${show.name}">
+      <div class="summary">${show.summary || "No summary available"}</div>
+      <p><strong>Genres:</strong> ${show.genres.join(", ")}</p>
+      <p><strong>Status:</strong> ${show.status}</p>
+      <p><strong>Rating:</strong> ${show.rating.average ?? "N/A"}</p>
+      <p><strong>Runtime:</strong> ${show.runtime ?? "N/A"} minutes</p>
+    `;
+
+    card.addEventListener("click", () => {
+      console.log("Show clicked:", show.id);
+    });
+
+    showsView.appendChild(card);
+  });
+}
+
 
 // Update the setup function to use fetch with async/wait
 
