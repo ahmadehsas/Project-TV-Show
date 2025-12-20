@@ -376,25 +376,21 @@ function createShowSelect() {
 
 
 function populateShowsList(shows) {
-// Disabled for Level 500
-
   const selectBox = document.querySelector("#showDropDownList");
-  if (!selectBox) {
-    console.error("#showDropDownList not found");
-    return;
-  }
+  if (!selectBox) return;
 
-  // Clear existing options and add default
   selectBox.innerHTML = '<option value="">--All Shows--</option>';
 
-  shows.forEach((show) => {
-    let episodeOption = document.createElement("option");
-    episodeOption.setAttribute("value", show.id);
-    episodeOption.textContent = show.name;
+  const sortedShows = sortShowsAlphabetically(shows); // ensure sorted
 
-    selectBox.appendChild(episodeOption);
+  sortedShows.forEach((show) => {
+    const option = document.createElement("option");
+    option.value = show.id;
+    option.textContent = show.name;
+    selectBox.appendChild(option);
   });
 }
+
 
 function selectShow() {
   document
