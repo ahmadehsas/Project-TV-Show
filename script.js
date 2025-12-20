@@ -94,20 +94,35 @@ async function fetchEpisodes(showId) {
 // Update the setup function to use fetch with async/wait
 
 async function setup() {
-  const rootElem = document.getElementById("root");
-  const loadingDiv = document.createElement("div");
-  const errorDiv = document.createElement("div");
-  errorDiv.setAttribute("id", "error");
   const bodyElem = document.querySelector("body");
-  loadingDiv.setAttribute("id", "loading");
+
+  const loadingDiv = document.createElement("div");
+  loadingDiv.id = "loading";
+
+  const errorDiv = document.createElement("div");
+  errorDiv.id = "error";
+
   bodyElem.append(loadingDiv, errorDiv);
-  //rootElem.innerHTML = "<p>Loading episodes…</p>";
-  createShowSelect();
 
-  loadShows();
-
-  selectShow();
+  await loadShows(); // ONLY load shows on start
 }
+
+
+// async function setup() {
+//   const rootElem = document.getElementById("root");
+//   const loadingDiv = document.createElement("div");
+//   const errorDiv = document.createElement("div");
+//   errorDiv.setAttribute("id", "error");
+//   const bodyElem = document.querySelector("body");
+//   loadingDiv.setAttribute("id", "loading");
+//   bodyElem.append(loadingDiv, errorDiv);
+//   //rootElem.innerHTML = "<p>Loading episodes…</p>";
+//   // createShowSelect();
+
+//   // loadShows();
+
+//   // selectShow();
+//}
 
 function setupSearch() {
   const searchBox = document.getElementById("searchBox");
@@ -158,7 +173,7 @@ function makePageForEpisodes(episodeList) {
   rootElem.innerHTML = "";
 
   // clear any text or previous content inside the root.
-  createShowSelect();
+  //createShowSelect();
 
   loadShows();
 
@@ -292,22 +307,24 @@ function createShowSelect() {
 }
 
 function populateShowsList(shows) {
-  const selectBox = document.querySelector("#showDropDownList");
-  if (!selectBox) {
-    console.error("#showDropDownList not found");
-    return;
-  }
+// Disabled for Level 500
 
-  // Clear existing options and add default
-  selectBox.innerHTML = '<option value="">--All Shows--</option>';
+  // const selectBox = document.querySelector("#showDropDownList");
+  // if (!selectBox) {
+  //   console.error("#showDropDownList not found");
+  //   return;
+  // }
 
-  shows.forEach((show) => {
-    let episodeOption = document.createElement("option");
-    episodeOption.setAttribute("value", show.id);
-    episodeOption.textContent = show.name;
+  // // Clear existing options and add default
+  // selectBox.innerHTML = '<option value="">--All Shows--</option>';
 
-    selectBox.appendChild(episodeOption);
-  });
+  // shows.forEach((show) => {
+  //   let episodeOption = document.createElement("option");
+  //   episodeOption.setAttribute("value", show.id);
+  //   episodeOption.textContent = show.name;
+
+  //   selectBox.appendChild(episodeOption);
+  // });
 }
 
 function selectShow() {
