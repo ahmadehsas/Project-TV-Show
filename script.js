@@ -172,22 +172,6 @@ async function setup() {
 
 
 
-// async function setup() {
-//   const rootElem = document.getElementById("root");
-//   const loadingDiv = document.createElement("div");
-//   const errorDiv = document.createElement("div");
-//   errorDiv.setAttribute("id", "error");
-//   const bodyElem = document.querySelector("body");
-//   loadingDiv.setAttribute("id", "loading");
-//   bodyElem.append(loadingDiv, errorDiv);
-//   //rootElem.innerHTML = "<p>Loading episodes…</p>";
-//   // createShowSelect();
-
-//   // loadShows();
-
-//   // selectShow();
-//}
-
 function setupSearch() {
   const searchBox = document.getElementById("searchBox");
   const searchString = document.getElementById("searchString");
@@ -421,19 +405,4 @@ function selectShow() {
     });
 }
 
-/**
- * 1. Add a `select` element to your page so the user can choose a show.
-    * add another select element    
-2. When the user first loads the page, make a `fetch` request to https://api.tvmaze.com/shows ([documentation](https://www.tvmaze.com/api#show-index)) to get a list of available shows, and add an entry to the drop-down per show.
-    * fetch index of episodes from tvmaze
-    * loop through the list and add each entry to drop down 
-    * when show is selected then fetch all episodes from that show
-      * use show id to build correct URL for selected shows episodeList 
-3. When a user selects a show, display the episodes for that show, just like the earlier levels of this project.
-    * use existing functions to display the episodeList from previous step.
 
-  You will need to perform a `fetch` to get the episode list.
-4. Make sure that your search and episode selector controls still work correctly when you change shows.
-5. Your select must list shows in alphabetical order, case-insensitive.
-6. During one user's visit to your website, you should never fetch any URL more than once.
- */
