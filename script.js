@@ -3,7 +3,7 @@
 // create global state.
 const showsEndpoint = "https://api.tvmaze.com/shows";
 let currentEpisodes = [];
-let Shows = [];
+
 let episodesCache = {};
 let showCache = null; //to test whether to fetch or not
 
@@ -135,7 +135,6 @@ async function loadEpisodesForShow(showId) {
     document.getElementById("episodes-view").classList.remove("hidden");
 
     makePageForEpisodes(episodes);
-    selectList();
     setupSearch();
   } catch (error) {
     showError("Could not load episodes. Please try again.");
@@ -162,12 +161,32 @@ async function setup() {
 
   const shows = sortShowsAlphabetically(await fetchShows());
 
-  createShowSelect();          // adds the show select dropdown
-  populateShowsList(shows);    // fills it with show options
-  selectShow();                // adds event listener to dropdown
+  createShowSelect();
+  populateShowsList(shows);
+  setupShowSearch(shows);       // dropdown filtering
+  setupShowCardSearch(shows);  //  NEW — card filtering
+  selectShow();
 
-  await loadShows();           // display all shows as cards initially
+  await loadShows();
 }
+
+
+function setupShowCardSearch(shows) {
+  const input = document.getElementById("showSearch");
+  if (!input) return;
+
+  input.addEventListener("input", () => {
+    const query = input.value.toLowerCase();
+
+    const filteredShows = shows.filter(show =>
+      show.name.toLowerCase().includes(query)
+    );
+
+    renderShows(filteredShows);
+  });
+}
+
+
 
 
 
@@ -205,11 +224,14 @@ function setupSearch() {
   });
 
   if (!document.querySelector("#dropDownList")) {
-    selectList();
+    
   }
 
   const selectElement = document.querySelector("#dropDownList");
+if (selectElement) {
   selectElement.addEventListener("change", selectEpisode);
+}
+
 }
 
 window.onload = setup;
@@ -242,15 +264,19 @@ function makePageForEpisodes(episodeList) {
     <span id="searchString"></span>
   `;
   rootElem.appendChild(search);
+  selectList();
 
   // 4. Episodes list
   episodeList.forEach((episode) => {
-    const card = document.createElement("div");
-    card.className = "episode-card";
+  const card = document.createElement("div");
+  card.className = "episode-card";
 
-    const episodeCode = `S${episode.season
-      .toString()
-      .padStart(2, "0")}E${episode.number.toString().padStart(2, "0")}`;
+  const episodeCode = `S${episode.season
+    .toString()
+    .padStart(2, "0")}E${episode.number.toString().padStart(2, "0")}`;
+
+  card.dataset.id = episodeCode;
+
 
     card.innerHTML = `
       <h3>${episode.name} - ${episodeCode}</h3>
@@ -288,7 +314,7 @@ function selectList() {
   selectBox.setAttribute("id", "dropDownList");
 
   const defaultOption = document.createElement("option");
-  defaultOption.setAttribute("value", "Choose an episode");
+  defaultOption.value = "";
   defaultOption.innerText = "--All Episodes--";
 
   selectLabel.appendChild(selectBox);
@@ -298,36 +324,37 @@ function selectList() {
   displayArea.append(selectLabel);
 
   currentEpisodes.forEach((episode) => {
-    let episodeName = `S${episode.season
-      .toString()
-      .padStart(2, "0")}E${episode.number.toString().padStart(2, "0")} - ${
-      episode.name
-    }`;
+  const episodeCode = `S${episode.season
+    .toString()
+    .padStart(2, "0")}E${episode.number.toString().padStart(2, "0")}`;
 
-    let episodeOption = document.createElement("option");
-    episodeOption.setAttribute("value", episodeName);
-    episodeOption.innerHTML = episodeName;
+  const episodeName = `${episodeCode} - ${episode.name}`;
 
-    selectBox.appendChild(episodeOption);
-  });
+  const episodeOption = document.createElement("option");
+  episodeOption.value = episodeCode;      //  matches dataset.id
+  episodeOption.innerText = episodeName;  // nice label
+
+  selectBox.appendChild(episodeOption);
+});
+
 }
 
 function selectEpisode(event) {
-  let selectedEpisode = event.target.value.toLowerCase();
-  let episodes = document.querySelectorAll(".episode-card");
-  episodes.forEach((episode) => {
-    let episodeName = (
-      episode.querySelector("h3")?.textContent || ""
-    ).toLowerCase();
-    if (rearrangeName(episodeName).includes(selectedEpisode)) {
-      episode.style.display = "block";
-    } else if (selectedEpisode === "choose an episode") {
-      episode.style.display = "block";
-    } else {
-      episode.style.display = "none";
+  const selectedId = event.target.value;
+
+  const cards = document.querySelectorAll(".episode-card");
+
+  cards.forEach(card => {
+    if (!selectedId) {
+      card.style.display = "block";
+      return;
     }
+
+    const id = card.dataset.id;
+    card.style.display = id === selectedId ? "block" : "none";
   });
 }
+
 
 function rearrangeName(episode) {
   let nameArray = episode.split("-");
@@ -335,28 +362,34 @@ function rearrangeName(episode) {
 }
 
 function createShowSelect() {
-  const rootElem = document.querySelector("#root");
+  const showsView = document.getElementById("shows-view");
 
-  const showSearch = document.createElement("div");
-  showSearch.id = "show-search";
+  const container = document.createElement("div");
+  container.id = "show-container";
 
-  const label = document.createElement("label");
-  label.setAttribute("for", "showDropDownList");
-  label.innerText = "Select Show: ";
+  // show search input
+  const input = document.createElement("input");
+  input.type = "text";
+  input.id = "showSearch";
+  input.placeholder = "Search shows...";
 
-  const selectBox = document.createElement("select");
-  selectBox.id = "showDropDownList";
-  selectBox.name = "show-list";
+  // show dropdown
+  const select = document.createElement("select");
+  select.id = "showDropDownList";
 
   const defaultOption = document.createElement("option");
   defaultOption.value = "";
   defaultOption.textContent = "--All Shows--";
 
-  selectBox.appendChild(defaultOption);
-  label.appendChild(selectBox);
-  showSearch.appendChild(label);
-  rootElem.prepend(showSearch);
+  select.appendChild(defaultOption);
+
+  container.append(input, select);
+
+  // insert ABOVE the shows list
+  showsView.parentNode.insertBefore(container, showsView);
 }
+
+
 
 
 function populateShowsList(shows) {
@@ -374,6 +407,29 @@ function populateShowsList(shows) {
     selectBox.appendChild(option);
   });
 }
+
+function setupShowSearch(shows) {
+  const input = document.getElementById("showSearch");
+  const select = document.getElementById("showDropDownList");
+
+  if (!input || !select) return;
+
+  input.addEventListener("input", () => {
+    const query = input.value.toLowerCase();
+
+    select.innerHTML = '<option value="">--All Shows--</option>';
+
+    shows
+      .filter(show => show.name.toLowerCase().includes(query))
+      .forEach(show => {
+        const option = document.createElement("option");
+        option.value = show.id;
+        option.textContent = show.name;
+        select.appendChild(option);
+      });
+  });
+}
+
 
 
 function selectShow() {
@@ -393,7 +449,6 @@ function selectShow() {
         document.getElementById("episodes-view").classList.remove("hidden");
 
         makePageForEpisodes(episodes);
-        selectList();
         setupSearch();
         resetSearchInput();
       } catch (error) {
